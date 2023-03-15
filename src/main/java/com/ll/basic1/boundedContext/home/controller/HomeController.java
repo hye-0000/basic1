@@ -1,5 +1,8 @@
-package com.ll.basic1;
+package com.ll.basic1.boundedContext.home.controller;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,10 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 @Controller
 public class HomeController {
@@ -21,6 +22,7 @@ public class HomeController {
     String name;
     int age;
     List<Person> people;
+
 
     public HomeController(){
         i = -1;
@@ -108,9 +110,9 @@ public class HomeController {
     @ResponseBody
     public String removePerson(int id, String name, int age){
         Person found = people
-                .stream()
-                .filter(p -> p.getId() == id)
-                .findFirst()
+                .stream()   //stream화
+                .filter(p -> p.getId() == id)   //p.getId() == id인 것 찾기
+                .findFirst()    //조건에 일치하는 요소들 중 순서가 가장 앞에 있는 것
                 .orElse(null);
 
         if (found == null) {
@@ -127,6 +129,61 @@ public class HomeController {
 //            }
 //        }
 //        return "%d번 사람이 수정 되었습니다.".formatted(id);
+    }
+
+    @GetMapping("/home/reqAndResp")
+    @ResponseBody
+    public void showReqAndResp(HttpServletRequest rq, HttpServletResponse resp) throws IOException{
+        int age = Integer.parseInt(rq.getParameter("age").replaceAll(" ", ""));
+        resp.getWriter().append("Hello, you are %d years old.".formatted(age));
+    }
+
+    @GetMapping("/home/reqAndRespV2")
+    @ResponseBody
+    public String showReqAndRespV2(int age){
+        return "Hello, you are %d years old.".formatted(age);
+    }
+
+    @GetMapping("/home/cookie/increase")
+    @ResponseBody
+    public int showCookieIncrease(HttpServletRequest rq, HttpServletResponse resp) throws IOException{
+        int cntInCookie = 0;
+        //고객이 가져온 쿠키에서 count 쿠키를 찾고 값을 가져온다
+        if(rq.getCookies() != null){
+            cntInCookie = Arrays.stream(rq.getCookies())
+                    .filter(cookie -> cookie.getName().equals("count"))
+                    .map(Cookie::getValue)
+                    .mapToInt(Integer::parseInt)
+                    .findFirst()
+                    .orElse(0);
+        }
+        int newCntInCookie = cntInCookie + 1;
+
+        //클라이언트가 가져온 count 값에 1을 더한 쿠폰을 만들어서 고객에게 보낸다
+        //쉽게 말해서 클라이언트에 저장되어 있는 cnt 쿠폰의 값을 1 증가시킨다
+        //이렇게 브라우저의 쿠키값을 변경하면 재방문싱데 스프링부트가 다시 그 값을 받게 되어있다
+        resp.addCookie(new Cookie("count", newCntInCookie + ""));
+
+        return newCntInCookie;
+    }
+
+    @GetMapping("/member/login1")
+    @ResponseBody
+    public Map<String, String> login(String username, String password){
+        String userName = "user1";
+        String userPw = "1234";
+        Map<String, String> result = new LinkedHashMap<>();
+        if(userName.equals(username) && userPw.equals(password)){
+            result.put("resultCode", "S-1");
+            result.put("msg", "user1님 환영합니다");
+        } else if (userName.equals(username) && !userPw.equals(password)) {
+            result.put("resultCode", "F-1");
+            result.put("msg", "비밀번호가 일치하지 않습니다.");
+        }else if(!userName.equals(username)){
+            result.put("resultCode", "F-2");
+            result.put("msg", "%s(은)는 존재하지 않는 회원입니다.".formatted(this.name));
+        }
+        return result;
     }
 }
 
@@ -147,3 +204,4 @@ class Person{
         this(++lastId, name, age);
     }
 }
+
