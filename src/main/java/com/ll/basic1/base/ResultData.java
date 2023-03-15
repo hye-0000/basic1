@@ -5,11 +5,11 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class RsData {
+public class ResultData {
     private final String resultCode;
     private final String msg;
 
-    public static RsData of(String resultCode, String msg) {
-        return new RsData(resultCode, msg);
+    public static ResultData of(String resultCode, String msg) {
+        return new ResultData(resultCode, msg);
     }
 }

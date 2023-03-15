@@ -1,5 +1,7 @@
 package com.ll.basic1.boundedContext.home.controller;
 
+import com.ll.basic1.boundedContext.member.entity.Member;
+import com.ll.basic1.boundedContext.member.service.MemberService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,11 +24,12 @@ public class HomeController {
     String name;
     int age;
     List<Person> people;
-
+    private MemberService memberService;
 
     public HomeController(){
         i = -1;
         people = new ArrayList<>();
+        memberService = new MemberService();
     }
     //@GetMapping
     //개발자가 스프링부트에게 말함
@@ -184,6 +187,12 @@ public class HomeController {
             result.put("msg", "%s(은)는 존재하지 않는 회원입니다.".formatted(this.name));
         }
         return result;
+    }
+
+    @GetMapping("/home/user1")
+    @ResponseBody
+    public Member showUser1() {
+        return memberService.findByUsername("user1");
     }
 }
 
