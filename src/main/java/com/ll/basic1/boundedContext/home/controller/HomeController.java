@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,12 +25,13 @@ public class HomeController {
     String name;
     int age;
     List<Person> people;
+    // 필드 주입
+    @Autowired
     private MemberService memberService;
 
     public HomeController(){
         i = -1;
         people = new ArrayList<>();
-        memberService = new MemberService();
     }
     //@GetMapping
     //개발자가 스프링부트에게 말함

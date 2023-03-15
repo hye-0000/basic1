@@ -3,7 +3,10 @@ package com.ll.basic1.boundedContext.member.service;
 import com.ll.basic1.base.ResultData;
 import com.ll.basic1.boundedContext.member.entity.Member;
 import com.ll.basic1.boundedContext.member.repository.MemberRepository;
+import org.springframework.stereotype.Service;
 
+//아래 클래스의 객체는 IoC 컨테이너에 의해 생성소멸 관리된다
+@Service
 public class MemberService {
     private MemberRepository memberRepository;
     public MemberService(){
