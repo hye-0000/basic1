@@ -25,7 +25,7 @@ public class HomeController {
     String name;
     int age;
     List<Person> people;
-    // 필드 주입
+
     @Autowired
     private MemberService memberService;
 
