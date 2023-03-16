@@ -4,31 +4,25 @@ import com.ll.basic1.base.ResultData;
 import com.ll.basic1.base.rq.Rq;
 import com.ll.basic1.boundedContext.member.entity.Member;
 import com.ll.basic1.boundedContext.member.service.MemberService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Cookie;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 
 @Controller
+@AllArgsConstructor
 public class MemberController {
     private final MemberService memberService;
+    private final Rq rq;
 
-    // 생성자 주입
-    @Autowired
-    public MemberController(MemberService memberService) {
-        this.memberService = memberService;
-    }
 
     @GetMapping("member/me")
     @ResponseBody
-    public ResultData showMe(HttpServletRequest req, HttpServletResponse resp){
-        Rq rq = new Rq(req, resp);
-
-        long loginedMemberId = rq.getCookieAsLong("loginedMemberId", 0);
+    public ResultData showMe(){
+        long loginedMemberId = rq.getSessionAsLong("loginedMemberId", 0);
 
         boolean isLogined = loginedMemberId > 0;
 
@@ -51,18 +45,31 @@ public class MemberController {
         return ResultData.of("S-1", "당신의 username(은)는 %s 입니다.".formatted(member.getUsername()));
     }
 
-
-
-
-
     @GetMapping("/member/login")
+    public String showLogin(String username, String password) {
+        return "usr/member/login.html";
+//        if(rq.isLogined()){
+//            return """
+//                    <h1> 이미 로그인 되었습니다.
+//                    """.stripIndent();
+//        }
+//        return """
+//                <h1>로그인</h1>
+//                <form action="/member/dologin">
+//                    <input type="text" name="username" placeholder="ID">
+//                    <input type="text" name="password" placeholder="PW">
+//                    <input type="submit" value="login">
+//                </form>
+//                """.stripIndent();
+    }
+
+    @PostMapping("/member/dologin")
     @ResponseBody
-    public ResultData login(String username, String password, HttpServletRequest req,  HttpServletResponse resp) {
+    public ResultData login(String username, String password) {
 //        Map<String, Object> rsData = new LinkedHashMap<>() {{
 //            put("resultCode", "S-1");
 //            put("msg", "%s 님 환영합니다.".formatted(username));
 //        }};
-        Rq rq = new Rq(req, resp);
         if ( username == null || username.trim().length() == 0 ) {
             return ResultData.of("F-3", "username(을)를 입력해주세요.");
         }
@@ -75,7 +82,7 @@ public class MemberController {
 
         if(resultData.isSuccess()){
             Member member = (Member) resultData.getData();
-            rq.setCookie("loginedMemberId", member.getId());
+            rq.setSession("loginedMemberId", member.getId());
         }
         return resultData;
 //        if(resultData.isSuccess()){
@@ -90,9 +97,8 @@ public class MemberController {
 
     @GetMapping("member/logout")
     @ResponseBody
-    public ResultData logout(HttpServletRequest req, HttpServletResponse resp){
-        Rq rq = new Rq(req, resp);
-        boolean cookieRemoved = rq.removeCookie("loginedMemberId");
+    public ResultData logout(){
+        boolean cookieRemoved = rq.removeSession("loginedMemberId");
 //        if(rq.getCookies() != null){
 //            Arrays.stream(rq.getCookies())
 //                    .filter(cookie -> cookie.getName().equals("loginMemberId"))
@@ -105,5 +111,12 @@ public class MemberController {
             return ResultData.of("S-2", "이미 로그아웃 상태입니다.");
         }
         return ResultData.of("S-1", "로그아웃 되었습니다.");
+    }
+
+    // 디버깅용 함수
+    @GetMapping("/member/session")
+    @ResponseBody
+    public String showSession() {
+        return rq.getSessionDebugContents().replaceAll("\n", "<br>");
     }
 }
