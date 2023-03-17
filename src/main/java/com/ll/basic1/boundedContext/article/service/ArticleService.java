@@ -14,8 +14,8 @@ public class ArticleService {
     public Article write(String title, String body) {
         Article article = Article
                 .builder()
-                .creatDate(LocalDateTime.now())
-                .modifyDate(LocalDateTime.now())
+//                .creatDate(LocalDateTime.now())   @createDate를 해줬기 때문에 안해줘도 됨
+//                .modifyDate(LocalDateTime.now())
                 .title(title)
                 .body(body)
                 .build();
