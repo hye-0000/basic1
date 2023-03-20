@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration  //프로그램이 실행될때 최초에 한번, Bean이라고 있는 부분을 스캔해서 객체를 만듦, Bean이 만든 객체들은 IoC 컨테이너에서 관리
 @Profile({"dev", "test"})   //오직 개발 환경과 테스트 환경에서 테스트해라
-//NotProd: 개발환경이 아니고, 테스트 환경이 아닐 때만 실행
+//NotProd: 개발/테스트 환경에서만 실행 -> 배포 때 사용 X
 public class NotProd {
     @Bean
     CommandLineRunner initData(MemberService memberService, ArticleService articleService) {
