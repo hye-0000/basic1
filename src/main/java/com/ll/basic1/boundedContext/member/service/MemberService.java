@@ -12,12 +12,9 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class MemberService {
     private MemberRepository memberRepository;
-    public MemberService(){
-        memberRepository = new MemberRepository();
-    }
 
     public ResultData tryLogin(String username, String password) {
-        Member member = memberRepository.findByUsername(username);
+        Member member = memberRepository.findByUsername(username).orElse(null); //값이 있으면 들어가고 없으면 null이 들어간다
 
         if (member == null) {
             return ResultData.of("F-2", "%s(은)는 존재하지 않는 회원입니다.".formatted(username));
@@ -30,10 +27,21 @@ public class MemberService {
     }
 
     public Member findByUsername(String username) {
-        return memberRepository.findByUsername(username);
+        return memberRepository.findByUsername(username).orElse(null);
     }
 
     public Member findById(long id) {
-        return memberRepository.findById(id);
+        return memberRepository.findById(id).orElse(null);
+    }
+
+    public Member join(String username, String password){
+        Member member = Member.builder()
+                .username(username)
+                .password(password)
+                .build();
+
+        memberRepository.save(member);
+
+        return member;
     }
 }

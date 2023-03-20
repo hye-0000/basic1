@@ -1,6 +1,8 @@
 server:
   port: 8010
 spring:
+  profiles:
+    active: dev #기본적으로 dev 환경임을 명시
   thymeleaf:
     cache: false #타임리프 캐시 끄기
     prefix: file:src/main/resources/templates/ # 타임리프 캐시 끄기
@@ -16,7 +18,8 @@ spring:
     password: 12301230
   jpa:
     hibernate:
-      ddl-auto: create # DB 테이블 자동 생성(엔티티 클래스만 만들면 됨)
+      ddl-auto: create # DB 테이블 자동 생성(엔티티 클래스만 만들면 됨), 프로그램을 재시작 할때마다 DB 스키마 재생성 -> 테스트하기가 귀찮아짐
     properties:
       hibernate:
         show_sql : true
+        format_sql : true
